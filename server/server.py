@@ -5,6 +5,7 @@ from serverjson import *
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
+ex_locals = {}
 
 
 def startServer():
@@ -21,5 +22,8 @@ def startServer():
                     if not data:
                         break
                     jsonObj = textToJson(data)
-                    print(jsonCode(jsonObj))
-                    exec(jsonCode(jsonObj))
+                    jCode = "result = "+jsonCode(jsonObj)
+                    print(jCode)
+                    exec(jCode, None, ex_locals)
+                    result = str(ex_locals['result'])
+                    conn.sendall(result.encode())
