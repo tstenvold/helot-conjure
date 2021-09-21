@@ -8,8 +8,9 @@ PORT = 12345        # The port used by the server
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((HOST, PORT))
     s.sendall(
-        b'{ "userName":"tester" ,"authToken":"abc123", "Code":"result = 2 \\nfor i in range (5,9): \\n\\tresult = result**i "}')
+        b'{ "userName":"teste" ,"authToken":"abc123", "Code":"result = 2 \\nfor i in range (5,9): \\n\\tresult = result**i "}')
     data = s.recv(2048)
+
 
 print('Sent Json Successfully')
 print('Received', repr(data))

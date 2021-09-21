@@ -11,5 +11,9 @@ def jsonAuthToken(jsonObj):
     return jsonObj["authToken"]
 
 
+def jsonUserName(jsonObj):
+    return jsonObj["userName"]
+
+
 def jsonCode(jsonObj):
     return jsonObj["Code"]

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import socket
+import database
 from serverjson import *
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
@@ -21,9 +22,17 @@ def startServer():
                     data = conn.recv(2048)
                     if not data:
                         break
+
                     jsonObj = textToJson(data)
                     jCode = jsonCode(jsonObj)
-                    print(jCode)
-                    exec(jCode, None, ex_locals)
-                    result = str(ex_locals['result'])
-                    conn.sendall(result.encode())
+                    uName = jsonUserName(jsonObj)
+                    aCode = jsonAuthToken(jsonObj)
+
+                    if(database.authenticate(uName, aCode)):
+                        print(jCode)
+                        exec(jCode, None, ex_locals)
+                        result = str(ex_locals['result'])
+                        conn.sendall(result.encode())
+                    else:
+                        print("Invalid User/Auth")
+                        conn.sendall(str("Invalid User/Auth").encode())

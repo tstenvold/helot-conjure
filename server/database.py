@@ -35,4 +35,16 @@ def listOfUsers():
     print(users)
 
 
-listOfUsers()
+def authenticate(uName, aCode):
+    con = sqlite3.connect(DBNAME)
+    cur = con.cursor()
+
+    cur.execute(
+        """SELECT userName , authCode FROM users WHERE userName=? AND authCode=?""", (uName, aCode))
+    result = cur.fetchone()
+    con.close()
+
+    if result:
+        return True
+
+    return False
