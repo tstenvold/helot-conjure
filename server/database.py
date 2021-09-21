@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 
 import sqlite3
+from os import path
 from sqlite3worker import Sqlite3Worker
 
 DBNAME = 'pyserverless.db'
+
+
+def databaseStart():
+    if not path.isfile(DBNAME):
+        initializeDB()
 
 
 def dbCommitClose(con):
@@ -17,6 +23,10 @@ def initializeDB():
 
     cur.execute(
         '''CREATE TABLE users (userID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, userName text NOT NULL, authCode text NOT NULL)''')
+    cur.execute(
+        '''CREATE TABLE processLog (processID INTEGER NOT NULL PRIMARY KEY, userID INTEGER, state INTEGER, time date, runTime INTEGER, FOREIGN KEY(userID) REFERENCES user(userID))''')
+
+    # only for debugging, should be removed later
     cur.execute(
         "INSERT INTO users (userName,authCode) VALUES ('tester','abc123')")
     cur.execute(

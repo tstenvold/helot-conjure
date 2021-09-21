@@ -28,7 +28,11 @@ def startServer():
                     uName = jsonUserName(jsonObj)
                     aCode = jsonAuthToken(jsonObj)
 
+                    # TODO
+                    # validate JSON
+                    # kick off into own thread and time
                     if(database.authenticate(uName, aCode)):
+                        print("\n Code:")
                         print(jCode)
                         exec(jCode, None, ex_locals)
                         result = str(ex_locals['result'])
