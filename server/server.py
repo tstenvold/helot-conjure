@@ -18,11 +18,11 @@ def startServer():
             with conn:
                 print('Connected by', addr)
                 while True:
-                    data = conn.recv(1024)
+                    data = conn.recv(2048)
                     if not data:
                         break
                     jsonObj = textToJson(data)
-                    jCode = "result = "+jsonCode(jsonObj)
+                    jCode = jsonCode(jsonObj)
                     print(jCode)
                     exec(jCode, None, ex_locals)
                     result = str(ex_locals['result'])
