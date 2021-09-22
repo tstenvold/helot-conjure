@@ -11,42 +11,38 @@ PORT = 12345        # The port used by the server
 class TestJsonFiles:
 
     def test_basic(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            assert sendJsonFile(s, "tests/basic.json") == "10"
-            s.close()
+        assert sendJsonFile("tests/basic.json") == "10"
 
     def test_function(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            assert sendJsonFile(s, "tests/function.json") == "6"
-            s.close()
+        assert sendJsonFile("tests/function.json") == "6"
 
     def test_invaliduser(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            assert sendString(
-                s, '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') == INVALIDAUTH
-            s.close()
+        assert sendString(
+            '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') == INVALIDAUTH
 
     def test_invalidauth(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            assert sendString(
-                s, '{"userName": "tester","authToken": " ","Code": "result = 2+2*4"}') == INVALIDAUTH
-            s.close()
+        assert sendString(
+            '{"userName": "tester","authToken": " ","Code": "result = 2+2*4"}') == INVALIDAUTH
+
+    def test_invalidCode(self):
+        assert sendString(
+            '{"userName": "tester","authToken": "abc123","Code": " string"}') == INVALIDCODE
 
 
-def sendString(con, text):
-    con.sendall(text.encode())
-    data = con.recv(2048)
-    return data.decode()
+def sendString(text):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as con:
+        con.connect((HOST, PORT))
+        con.sendall(text.encode())
+        data = con.recv(2048)
+        return data.decode()
 
 
-def sendJsonFile(con, filePath):
-    f = open(filePath, "r")
-    jText = f.read()
-    f.close()
-    con.sendall(jText.encode())
-    data = con.recv(2048)
-    return data.decode()
+def sendJsonFile(filePath):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as con:
+        con.connect((HOST, PORT))
+        with open(filePath, "r") as f:
+            jText = f.read()
+
+        con.sendall(jText.encode())
+        data = con.recv(2048)
+        return data.decode()
