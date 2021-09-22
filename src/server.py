@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-
 import socket
 import database
-from serverjson import *
+import serverjson
+import messages
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
@@ -23,20 +22,20 @@ def startServer():
                     if not data:
                         break
 
-                    jsonObj = textToJson(data)
-                    jCode = jsonCode(jsonObj)
-                    uName = jsonUserName(jsonObj)
-                    aCode = jsonAuthToken(jsonObj)
+                    jsonObj = serverjson.textToJson(data)
+                    jCode = serverjson.jsonCode(jsonObj)
+                    uName = serverjson.jsonUserName(jsonObj)
+                    aCode = serverjson.jsonAuthToken(jsonObj)
 
                     # TODO
                     # validate JSON
                     # kick off into own thread and time
                     if(database.authenticate(uName, aCode)):
-                        print("\n Code:")
+                        print("\nCode:")
                         print(jCode)
                         exec(jCode, None, ex_locals)
                         result = str(ex_locals['result'])
                         conn.sendall(result.encode())
                     else:
-                        print("Invalid User/Auth")
-                        conn.sendall(str("Invalid User/Auth").encode())
+                        print(messages.INVALIDAUTH)
+                        conn.sendall(str(messages.INVALIDAUTH).encode())
