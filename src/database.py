@@ -5,17 +5,17 @@ from sqlite3worker import Sqlite3Worker
 DBNAME = 'pyserverless.db'
 
 
-def databaseStart():
+def database_start():
     if not path.isfile(DBNAME):
-        initializeDB()
+        initialize_DB()
 
 
-def dbCommitClose(con):
+def db_commit_close(con):
     con.commit()
     con.close()
 
 
-def initializeDB():
+def initialize_DB():
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
 
@@ -30,10 +30,10 @@ def initializeDB():
     cur.execute(
         "INSERT INTO users (userName,authCode) VALUES ('tstenvold','asdfg12345')")
 
-    dbCommitClose(con)
+    db_commit_close(con)
 
 
-def listOfUsers():
+def list_users():
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
     users = cur.execute(
@@ -43,7 +43,7 @@ def listOfUsers():
     print(users)
 
 
-def authenticate(uName, aCode):
+def authenticate_user(uName, aCode):
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
 
