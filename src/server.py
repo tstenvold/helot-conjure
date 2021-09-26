@@ -45,7 +45,6 @@ def service_connection(sel, key, mask):
 
     except:
         print(messages.CONNERROR)
-        return
 
 
 def start_server():
@@ -58,6 +57,7 @@ def start_server():
     sel.register(lsock, selectors.EVENT_READ, data=None)
 
     while True:
+
         events = sel.select(timeout=None)
         for key, mask in events:
             if key.data is None:
@@ -79,14 +79,19 @@ def json_process(data):
     # TODO
     # validate JSON
     # kick off into own thread and time
+    # Sandbox exec env
     if(database.authenticate_user(uName, aCode)):
         try:
             sTime = time.time()
-            procID = database.insert_proc(uName, sTime)
+            procID = database.insert_new_proc(uName, sTime)
+
             exec(jCode, None, ex_locals)
+
+            fTime = time.time()
+            database.finish_proc(procID, fTime)
+
             result = str(ex_locals['result'])
-            print("Process ID: ", procID)
-            print("Result: ", result)
+
         # TODO catch other exceptions
         except:
             result = messages.INVALIDCODE

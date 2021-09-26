@@ -70,13 +70,23 @@ def authenticate_user(uName, aCode):
     return False
 
 
-def insert_proc(uName, sTime):
+def insert_new_proc(uName, sTime):
     userID = get_id_user(uName)
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
     procID = generate_proc_id()
     cur.execute("INSERT INTO processLog (processID, userID, state, starttime) VALUES (?,?,?,?)",
                 (procID, userID, messages.STATE_START, sTime))
+
+    db_commit_close(con)
+    return procID
+
+
+def finish_proc(procID, fTime):
+    con = sqlite3.connect(DBNAME)
+    cur = con.cursor()
+    cur.execute("UPDATE processLog SET state=?, endtime=? WHERE processID=?",
+                (messages.STATE_FINISHED, fTime, procID))
 
     db_commit_close(con)
 

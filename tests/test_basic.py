@@ -31,7 +31,7 @@ class TestJsonFiles:
 
     def test_longexec(self):
         assert sendString(
-            '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (5,15):\\n\\tresult=result**i\\nresult%=10"}') == "6"
+            '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult%=10"}') == "6"
 
 
 def sendString(text):
