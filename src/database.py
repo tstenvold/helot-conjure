@@ -1,5 +1,7 @@
 import sqlite3
 from os import path
+import uuid
+import messages
 from sqlite3worker import Sqlite3Worker
 
 DBNAME = 'pyserverless.db'
@@ -22,7 +24,7 @@ def initialize_DB():
     cur.execute(
         '''CREATE TABLE users (userID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, userName text NOT NULL, authCode text NOT NULL)''')
     cur.execute(
-        '''CREATE TABLE processLog (processID INTEGER NOT NULL PRIMARY KEY, userID INTEGER, state INTEGER, time date, runTime INTEGER, FOREIGN KEY(userID) REFERENCES user(userID))''')
+        '''CREATE TABLE processLog (processID STRING NOT NULL PRIMARY KEY, userID INTEGER, state STRING, starttime REAL, endtime REAL, FOREIGN KEY(userID) REFERENCES user(userID))''')
 
     # only for debugging, should be removed later
     cur.execute(
@@ -43,6 +45,16 @@ def list_users():
     print(users)
 
 
+def get_id_user(uName):
+    con = sqlite3.connect(DBNAME)
+    cur = con.cursor()
+    cur.execute(
+        "SELECT userID FROM users WHERE userName=?", [uName])
+    result = cur.fetchone()
+    con.close()
+    return result[0]
+
+
 def authenticate_user(uName, aCode):
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
@@ -56,3 +68,18 @@ def authenticate_user(uName, aCode):
         return True
 
     return False
+
+
+def insert_proc(uName, sTime):
+    userID = get_id_user(uName)
+    con = sqlite3.connect(DBNAME)
+    cur = con.cursor()
+    procID = generate_proc_id()
+    cur.execute("INSERT INTO processLog (processID, userID, state, starttime) VALUES (?,?,?,?)",
+                (procID, userID, messages.STATE_START, sTime))
+
+    db_commit_close(con)
+
+
+def generate_proc_id():
+    return uuid.uuid1().hex

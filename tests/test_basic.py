@@ -4,8 +4,9 @@ import socket
 import pytest
 from messages import *
 
-HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 12345        # The port used by the server
+HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
+PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
+PSIZE = 2048
 
 
 class TestJsonFiles:
@@ -28,12 +29,16 @@ class TestJsonFiles:
         assert sendString(
             '{"userName": "tester","authToken": "abc123","Code": " string"}') == INVALIDCODE
 
+    def test_longexec(self):
+        assert sendString(
+            '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (5,15):\\n\\tresult=result**i\\nresult%=10"}') == "6"
+
 
 def sendString(text):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as con:
         con.connect((HOST, PORT))
         con.sendall(text.encode())
-        data = con.recv(2048)
+        data = con.recv(PSIZE)
         return data.decode()
 
 
@@ -44,5 +49,5 @@ def sendJsonFile(filePath):
             jText = f.read()
 
         con.sendall(jText.encode())
-        data = con.recv(2048)
+        data = con.recv(PSIZE)
         return data.decode()

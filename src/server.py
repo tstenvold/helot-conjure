@@ -6,9 +6,11 @@ import selectors
 import database
 import serverjson
 import messages
+import time
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
+PSIZE = 2048
 
 
 def accept_wrapper(sel, sock):
@@ -24,21 +26,26 @@ def service_connection(sel, key, mask):
     sock = key.fileobj
     data = key.data
 
-    if mask & selectors.EVENT_READ:
-        recv_data = sock.recv(1024)  # Should be ready to read
-        if recv_data:
-            data.outb += recv_data
-        else:
-            print('closing connection to', data.addr)
-            sel.unregister(sock)
-            sock.close()
+    try:
+        if mask & selectors.EVENT_READ:
+            recv_data = sock.recv(PSIZE)  # Should be ready to read
+            if recv_data:
+                data.outb += recv_data
+            else:
+                print('closing connection to', data.addr)
+                sel.unregister(sock)
+                sock.close()
 
-    if mask & selectors.EVENT_WRITE:
-        if data.outb:
-            result = json_process(data.outb)
-            # TODO should give a response rather than wait for process completition
-            sent = sock.send(result.encode())
-            data.outb = ''
+        if mask & selectors.EVENT_WRITE:
+            if data.outb:
+                result = json_process(data.outb)
+                # TODO should give a response rather than wait for process completition
+                sent = sock.send(result.encode())
+                data.outb = ''
+
+    except:
+        print(messages.CONNERROR)
+        return
 
 
 def start_server():
@@ -73,11 +80,14 @@ def json_process(data):
     # validate JSON
     # kick off into own thread and time
     if(database.authenticate_user(uName, aCode)):
-        print("\nCode:")
-        print(jCode)
         try:
+            sTime = time.time()
+            procID = database.insert_proc(uName, sTime)
             exec(jCode, None, ex_locals)
             result = str(ex_locals['result'])
+            print("Process ID: ", procID)
+            print("Result: ", result)
+        # TODO catch other exceptions
         except:
             result = messages.INVALIDCODE
 
