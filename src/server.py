@@ -11,7 +11,7 @@ import time
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
-PSIZE = 2048
+PSIZE = 2048        # Standard size of data to be send / recieved
 
 
 def accept_wrapper(sel, sock):
@@ -73,24 +73,19 @@ def json_process(data):
     ex_locals = {}
 
     try:
-        jsonObj = serverjson.textToJson(data)
-        jCode = serverjson.jsonCode(jsonObj)
-        uName = serverjson.jsonUserName(jsonObj)
-        aCode = serverjson.jsonAuthToken(jsonObj)
-
+        request = serverjson.jsonRequest(data)
     except JSONDecodeError:
         return messages.INVALIDJSON
 
     # TODO
-    # validate JSON
     # kick off into own thread and time
     # Sandbox exec env
-    if(database.authenticate_user(uName, aCode)):
+    if(database.authenticate_user(request.uName, request.aCode)):
         try:
             sTime = time.time()
-            procID = database.insert_new_proc(uName, sTime)
+            procID = database.insert_new_proc(request.uName, sTime)
 
-            exec(jCode, None, ex_locals)
+            exec(request.jCode, None, ex_locals)
 
             fTime = time.time()
             database.finish_proc(procID, fTime)
