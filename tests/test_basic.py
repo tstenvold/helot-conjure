@@ -17,6 +17,10 @@ def test_function():
     assert sendJsonFile("tests/function.json") == "6"
 
 
+def test_os_call():
+    assert sendJsonFile("tests/advanced.json") == INVALIDCODE
+
+
 def test_invaliduser():
     assert sendString(
         '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') == INVALIDAUTH
