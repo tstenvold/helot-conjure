@@ -71,10 +71,12 @@ def start_server():
 def exec_sandbox(jCode):
     result = ''
     ex_locals = {}
-
-    byte_code = compile(jCode, filename='<inline code>', mode='exec')
-    exec(byte_code, None, ex_locals)
-    result = str(ex_locals['result'])
+    try:
+        byte_code = compile(jCode, filename='<inline code>', mode='exec')
+        exec(byte_code, None, ex_locals)
+        result = str(ex_locals['result'])
+    except:
+        result = messages.INVALIDCODE
 
     return result
 
@@ -90,18 +92,15 @@ def json_process(data):
     # kick off into own thread and time
     # Sandbox exec env
     if(database.authenticate_user(request.uName, request.aCode)):
-        try:
-            sTime = time.time()
-            procID = database.insert_new_proc(request.uName, sTime)
 
-            result = exec_sandbox(request.jCode)
-
-            fTime = time.time()
+        sTime = time.time()
+        procID = database.insert_new_proc(request.uName, sTime)
+        result = exec_sandbox(request.jCode)
+        fTime = time.time()
+        if result == messages.INVALIDCODE:
+            database.crashed_proc(procID, fTime)
+        else:
             database.finish_proc(procID, fTime)
-
-        # TODO catch other exceptions
-        except:
-            result = messages.INVALIDCODE
 
         return result
     else:
