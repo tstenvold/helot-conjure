@@ -25,6 +25,10 @@ class TestJsonFiles:
         assert sendString(
             '{"userName": "tester","authToken": " ","Code": "result = 2+2*4"}') == INVALIDAUTH
 
+    def test_invalidjson(self):
+        assert sendString(
+            '<xml>This is not a json</xml>') == INVALIDJSON
+
     def test_invalidCode(self):
         assert sendString(
             '{"userName": "tester","authToken": "abc123","Code": " string"}') == INVALIDCODE

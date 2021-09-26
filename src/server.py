@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from json.decoder import JSONDecodeError
 import socket
 import types
 import selectors
@@ -71,10 +72,14 @@ def json_process(data):
     result = ''
     ex_locals = {}
 
-    jsonObj = serverjson.textToJson(data)
-    jCode = serverjson.jsonCode(jsonObj)
-    uName = serverjson.jsonUserName(jsonObj)
-    aCode = serverjson.jsonAuthToken(jsonObj)
+    try:
+        jsonObj = serverjson.textToJson(data)
+        jCode = serverjson.jsonCode(jsonObj)
+        uName = serverjson.jsonUserName(jsonObj)
+        aCode = serverjson.jsonAuthToken(jsonObj)
+
+    except JSONDecodeError:
+        return messages.INVALIDJSON
 
     # TODO
     # validate JSON
