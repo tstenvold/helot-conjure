@@ -10,9 +10,7 @@ import socket
 from RestrictedPython import compile_restricted_exec
 from os import ftruncate
 from json.decoder import JSONDecodeError
-<< << << < HEAD
-== == == =
->>>>>> > sandbox
+
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
