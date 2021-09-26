@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from json.decoder import JSONDecodeError
+from os import ftruncate
 import socket
 import types
 import selectors
@@ -83,6 +84,7 @@ def json_process(data):
     if(database.authenticate_user(request.uName, request.aCode)):
         try:
             sTime = time.time()
+            fTime = sTime  # set finish time to a default value in case of crash
             procID = database.insert_new_proc(request.uName, sTime)
 
             exec(request.jCode, None, ex_locals)
@@ -94,6 +96,7 @@ def json_process(data):
 
         # TODO catch other exceptions
         except:
+            database.crashed_proc(procID, fTime)
             result = messages.INVALIDCODE
 
         return result

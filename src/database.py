@@ -91,5 +91,14 @@ def finish_proc(procID, fTime):
     db_commit_close(con)
 
 
+def crashed_proc(procID, fTime):
+    con = sqlite3.connect(DBNAME)
+    cur = con.cursor()
+    cur.execute("UPDATE processLog SET state=?, endtime=? WHERE processID=?",
+                (messages.STATE_ERROR, fTime, procID))
+
+    db_commit_close(con)
+
+
 def generate_proc_id():
     return uuid.uuid1().hex
