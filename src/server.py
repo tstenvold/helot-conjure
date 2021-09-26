@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 
-from json.decoder import JSONDecodeError
-from os import ftruncate
-import socket
-import types
-import selectors
-import database
-import serverjson
-import messages
 import time
+import messages
+import serverjson
+import database
+import selectors
+import types
+import socket
+from RestrictedPython import compile_restricted_exec
+from os import ftruncate
+from json.decoder import JSONDecodeError
+<< << << < HEAD
+== == == =
+>>>>>> > sandbox
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
@@ -68,10 +72,20 @@ def start_server():
                 service_connection(sel, key, mask)
 
 
-def json_process(data):
-    # necessary local initalized vars
+def exec_sandbox(jCode):
     result = ''
     ex_locals = {}
+    try:
+        byte_code = compile(jCode, filename='<inline code>', mode='exec')
+        exec(byte_code, None, ex_locals)
+        result = str(ex_locals['result'])
+    except:
+        result = messages.INVALIDCODE
+
+    return result
+
+
+def json_process(data):
 
     try:
         request = serverjson.jsonRequest(data)
@@ -82,24 +96,16 @@ def json_process(data):
     # kick off into own thread and time
     # Sandbox exec env
     if(database.authenticate_user(request.uName, request.aCode)):
-        try:
-            sTime = time.time()
-            fTime = sTime  # set finish time to a default value in case of crash
-            procID = database.insert_new_proc(request.uName, sTime)
 
-            exec(request.jCode, None, ex_locals)
-
-            fTime = time.time()
-            database.finish_proc(procID, fTime)
-
-            result = str(ex_locals['result'])
-
-        # TODO catch other exceptions
-        except:
+        sTime = time.time()
+        procID = database.insert_new_proc(request.uName, sTime)
+        result = exec_sandbox(request.jCode)
+        fTime = time.time()
+        if result == messages.INVALIDCODE:
             database.crashed_proc(procID, fTime)
-            result = messages.INVALIDCODE
-
-        return result
+        else:
+            database.finish_proc(procID, fTime)
     else:
-        print(messages.INVALIDAUTH)
-        return messages.INVALIDAUTH
+        result = messages.INVALIDAUTH
+
+    return result
