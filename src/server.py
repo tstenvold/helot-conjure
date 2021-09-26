@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from json.decoder import JSONDecodeError
+from RestrictedPython import compile_restricted_exec
 import socket
 import types
 import selectors
@@ -67,10 +68,18 @@ def start_server():
                 service_connection(sel, key, mask)
 
 
-def json_process(data):
-    # necessary local initalized vars
+def exec_sandbox(jCode):
     result = ''
     ex_locals = {}
+
+    byte_code = compile(jCode, filename='<inline code>', mode='exec')
+    exec(byte_code, None, ex_locals)
+    result = str(ex_locals['result'])
+
+    return result
+
+
+def json_process(data):
 
     try:
         request = serverjson.jsonRequest(data)
@@ -85,12 +94,10 @@ def json_process(data):
             sTime = time.time()
             procID = database.insert_new_proc(request.uName, sTime)
 
-            exec(request.jCode, None, ex_locals)
+            result = exec_sandbox(request.jCode)
 
             fTime = time.time()
             database.finish_proc(procID, fTime)
-
-            result = str(ex_locals['result'])
 
         # TODO catch other exceptions
         except:
