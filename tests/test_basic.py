@@ -9,33 +9,37 @@ PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
 PSIZE = 2048
 
 
-class TestJsonFiles:
+def test_basic():
+    assert sendJsonFile("tests/basic.json") == "10"
 
-    def test_basic(self):
-        assert sendJsonFile("tests/basic.json") == "10"
 
-    def test_function(self):
-        assert sendJsonFile("tests/function.json") == "6"
+def test_function():
+    assert sendJsonFile("tests/function.json") == "6"
 
-    def test_invaliduser(self):
-        assert sendString(
-            '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') == INVALIDAUTH
 
-    def test_invalidauth(self):
-        assert sendString(
-            '{"userName": "tester","authToken": " ","Code": "result = 2+2*4"}') == INVALIDAUTH
+def test_invaliduser():
+    assert sendString(
+        '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') == INVALIDAUTH
 
-    def test_invalidjson(self):
-        assert sendString(
-            '<xml>This is not a json</xml>') == INVALIDJSON
 
-    def test_invalidCode(self):
-        assert sendString(
-            '{"userName": "tester","authToken": "abc123","Code": " string"}') == INVALIDCODE
+def test_invalidauth():
+    assert sendString(
+        '{"userName": "tester","authToken": " ","Code": "result = 2+2*4"}') == INVALIDAUTH
 
-    def test_longexec(self):
-        assert sendString(
-            '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult%=10"}') == "6"
+
+def test_invalidjson():
+    assert sendString(
+        '<xml>This is not a json</xml>') == INVALIDJSON
+
+
+def test_invalidCode():
+    assert sendString(
+        '{"userName": "tester","authToken": "abc123","Code": " string"}') == INVALIDCODE
+
+
+def test_longexec():
+    assert sendString(
+        '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult%=10"}') == "6"
 
 
 def sendString(text):

@@ -90,15 +90,13 @@ def json_process(data):
     except JSONDecodeError:
         return messages.INVALIDJSON
 
-    # TODO
-    # kick off into own thread and time
-    # Sandbox exec env
     if(database.authenticate_user(request.uName, request.aCode)):
 
         sTime = time.time()
         procID = database.insert_new_proc(request.uName, sTime)
         result = exec_sandbox(request.jCode)
         fTime = time.time()
+
         if result == messages.INVALIDCODE:
             database.crashed_proc(procID, fTime)
         else:
