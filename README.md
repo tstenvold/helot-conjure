@@ -19,7 +19,7 @@ The database needs to be configured first run with `--dbadmin` to initialize the
 The client shows a basic expample of how to connect, send a json and recieve back the processed data
 
 ## Tests
-Tests currently only operate as client requests but will in future test database aspects and server side etc.
+Tests currently only operate as client requests but will in the future, test database aspects and server side etc.
 Tests should be run from the main directory with `pytest test/` 
 The test will purge the database and all info there will be lost.
 
