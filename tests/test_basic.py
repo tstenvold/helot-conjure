@@ -2,7 +2,7 @@
 
 import socket
 import pytest
-from messages import *
+import messages
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
@@ -18,27 +18,27 @@ def test_function():
 
 
 def test_os_call():
-    assert sendJsonFile("tests/advanced.json") == INVALIDCODE
+    assert sendJsonFile("tests/advanced.json") == messages.INVALIDCODE
 
 
 def test_invaliduser():
     assert sendString(
-        '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') == INVALIDAUTH
+        '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') == messages.INVALIDAUTH
 
 
 def test_invalidauth():
     assert sendString(
-        '{"userName": "tester","authToken": " ","Code": "result = 2+2*4"}') == INVALIDAUTH
+        '{"userName": "tester","authToken": " ","Code": "result = 2+2*4"}') == messages.INVALIDAUTH
 
 
 def test_invalidjson():
     assert sendString(
-        '<xml>This is not a json</xml>') == INVALIDJSON
+        '<xml>This is not a json</xml>') == messages.INVALIDJSON
 
 
 def test_invalidCode():
     assert sendString(
-        '{"userName": "tester","authToken": "abc123","Code": " string"}') == INVALIDCODE
+        '{"userName": "tester","authToken": "abc123","Code": " string"}') == messages.INVALIDCODE
 
 
 def test_longexec():

@@ -1,8 +1,8 @@
 import sqlite3
 from os import path
 import uuid
+
 import messages
-from sqlite3worker import Sqlite3Worker
 
 DBNAME = 'pyserverless.db'
 

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-from database import DBNAME
-from database_admin import admin_welcome
-from server import start_server
-from messages import *
 from os import path
 import sys
 from optparse import OptionParser
+
+from database import DBNAME
+from database_admin import admin_welcome
+from server import start_server
+import messages
 
 
 def cmd_parse(argv):
@@ -32,17 +33,17 @@ def cmd_parse(argv):
 def handle_args(argv):
 
     parser = cmd_parse(argv)
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()[0]
 
     ipaddr = options.ipaddr
     port = options.port
     psize = options.psize
 
-    if options.admin_welcome == True:
+    if options.admin_welcome:
         admin_welcome()
     else:
         if not path.isfile(DBNAME):
-            print(ERROR_NODB)
+            print(messages.ERROR_NODB)
         else:
             start_server(ipaddr, port, psize)
 

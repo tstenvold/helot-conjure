@@ -3,9 +3,9 @@
 import sqlite3
 from os import path
 import uuid
+
 import database
-from messages import *
-from sqlite3worker import Sqlite3Worker
+from messages import DBA_WELCOME, DBA_ADDED, DBA_AUTH, DBA_DELETED, DBA_INIT, DBA_NAME, DBA_COMMANDS
 
 
 def admin_welcome():

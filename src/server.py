@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
 import time
-import messages
-import serverjson
-import database
 import selectors
 import types
 import socket
@@ -11,7 +8,9 @@ from RestrictedPython import compile_restricted_exec
 from os import ftruncate
 from json.decoder import JSONDecodeError
 
-PSIZE = 1024
+import messages
+import serverjson
+import database
 
 
 def accept_wrapper(sel, sock):
@@ -23,13 +22,13 @@ def accept_wrapper(sel, sock):
     sel.register(conn, events, data=data)
 
 
-def service_connection(sel, key, mask):
+def service_connection(sel, key, mask, psize):
     sock = key.fileobj
     data = key.data
 
     try:
         if mask & selectors.EVENT_READ:
-            recv_data = sock.recv(PSIZE)  # Should be ready to read
+            recv_data = sock.recv(psize)  # Should be ready to read
             if recv_data:
                 data.outb += recv_data
             else:
@@ -49,7 +48,6 @@ def service_connection(sel, key, mask):
 
 
 def start_server(ip, port, psize):
-    PSIZE = psize  # set the global packet size default is 1024
     sel = selectors.DefaultSelector()
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     lsock.bind((ip, port))
@@ -65,7 +63,7 @@ def start_server(ip, port, psize):
             if key.data is None:
                 accept_wrapper(sel, key.fileobj)
             else:
-                service_connection(sel, key, mask)
+                service_connection(sel, key, mask, psize)
 
 
 def exec_sandbox(jCode):
@@ -88,7 +86,7 @@ def json_process(data):
     except JSONDecodeError:
         return messages.INVALIDJSON
 
-    if(database.authenticate_user(request.uName, request.aCode)):
+    if database.authenticate_user(request.uName, request.aCode):
 
         sTime = time.time()
         procID = database.insert_new_proc(request.uName, sTime)
