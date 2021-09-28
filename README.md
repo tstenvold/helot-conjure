@@ -20,6 +20,8 @@ The client shows a basic expample of how to connect, send a json and recieve bac
 
 ## Tests
 Tests currently only operate as client requests but will in future test database aspects and server side etc.
+Tests should be run from the main directory with `pytest test/` 
+The test will purge the database and all info there will be lost.
 
 ## Current Problems
 - Sandboxed run environment is laughable, so this only works for trusted request (see next point)
