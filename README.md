@@ -22,6 +22,6 @@ The client shows a basic expample of how to connect, send a json and recieve bac
 Tests currently only operate as client requests but will in future test database aspects and server side etc.
 
 ## Current Problems
--Sandboxed run environment is laughible, so this only works for trusted request (see next point)
--I've not decided upon how authentication will actually take place
--Likely in the future the server will respond with a process id instead of returning the execution result itself. This will allow the process to run long without threat of timing out the connection and then allow the client to request the result multiple times.
+- Sandboxed run environment is laughable, so this only works for trusted request (see next point)
+- I've not decided upon how authentication will actually take place
+- Likely in the future the server will respond with a process id instead of returning the execution result itself. This will allow the process to run long without threat of timing out the connection and then allow the client to request the result multiple times.
