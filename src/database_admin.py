@@ -8,7 +8,7 @@ from messages import *
 from sqlite3worker import Sqlite3Worker
 
 
-def database_admin_welcome():
+def admin_welcome():
     print("")
     print(DBA_WELCOME)
     db_command()
@@ -51,6 +51,3 @@ def del_user():
     database.del_user(uName)
     print(DBA_DELETED, uName)
     db_command()
-
-
-database_admin_welcome()

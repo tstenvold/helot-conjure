@@ -11,10 +11,7 @@ from RestrictedPython import compile_restricted_exec
 from os import ftruncate
 from json.decoder import JSONDecodeError
 
-
-HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
-PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
-PSIZE = 2048        # Standard size of data to be send / recieved
+PSIZE = 1024
 
 
 def accept_wrapper(sel, sock):
@@ -51,12 +48,13 @@ def service_connection(sel, key, mask):
         print(messages.CONNERROR)
 
 
-def start_server():
+def start_server(ip, port, psize):
+    PSIZE = psize  # set the global packet size default is 1024
     sel = selectors.DefaultSelector()
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    lsock.bind((HOST, PORT))
+    lsock.bind((ip, port))
     lsock.listen()
-    print('listening on', (HOST, PORT))
+    print('listening on', (ip, port))
     lsock.setblocking(False)
     sel.register(lsock, selectors.EVENT_READ, data=None)
 

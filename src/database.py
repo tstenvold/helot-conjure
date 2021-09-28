@@ -7,11 +7,6 @@ from sqlite3worker import Sqlite3Worker
 DBNAME = 'pyserverless.db'
 
 
-def database_start():
-    if not path.isfile(DBNAME):
-        initialize_DB()
-
-
 def db_commit_close(con):
     con.commit()
     con.close()
@@ -21,17 +16,30 @@ def initialize_DB():
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
 
+    cur.execute("DROP TABLE IF EXISTS users")
+    cur.execute("DROP TABLE IF EXISTS processLog")
+
     cur.execute(
         '''CREATE TABLE users (userID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, userName text NOT NULL, authCode text NOT NULL)''')
     cur.execute(
         '''CREATE TABLE processLog (processID STRING NOT NULL PRIMARY KEY, userID INTEGER, state STRING, starttime REAL, endtime REAL, FOREIGN KEY(userID) REFERENCES user(userID))''')
 
-    # only for debugging, should be removed later
-    cur.execute(
-        "INSERT INTO users (userName,authCode) VALUES ('tester','abc123')")
-    cur.execute(
-        "INSERT INTO users (userName,authCode) VALUES ('tstenvold','asdfg12345')")
+    db_commit_close(con)
 
+
+def add_user(uName, authCode):
+    con = sqlite3.connect(DBNAME)
+    cur = con.cursor()
+    cur.execute(
+        "INSERT INTO users (userName,authCode) VALUES (?,?)", (uName, authCode))
+    db_commit_close(con)
+
+
+def del_user(uName):
+    con = sqlite3.connect(DBNAME)
+    cur = con.cursor()
+    cur.execute(
+        "DELETE FROM users WHERE userName=?", [uName])
     db_commit_close(con)
 
 
