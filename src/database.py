@@ -16,6 +16,7 @@ def initialize_DB():
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
 
+    # If for some reason called with existing tables, this will delete everything! Keep your wits or lose your data
     cur.execute("DROP TABLE IF EXISTS users")
     cur.execute("DROP TABLE IF EXISTS processLog")
 

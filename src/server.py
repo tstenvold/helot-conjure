@@ -41,6 +41,7 @@ def service_connection(sel, key, mask, psize):
                 result = json_process(data.outb)
                 # TODO should give a response rather than wait for process completition
                 sent = sock.send(result.encode())
+                # remove data from output when result is sent
                 data.outb = ''
 
     except:
