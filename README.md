@@ -16,7 +16,7 @@ JSON Format
 The database needs to be configured first run with `--dbadmin` to initialize the database (option `3` then `1`)
 
 ## Client
-The client shows a basic example of how to connect, send a json and recieve back the processed data
+The client shows a basic example of how to connect, send a json and receive back the processed data
 
 ## Tests
 Tests currently only operate as client requests but will in the future, test database aspects and server side etc.
