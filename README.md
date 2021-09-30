@@ -2,7 +2,7 @@
 
 A simple serverless implementation for offloading process intensive operations from embedded and mobile devices without having to maintain a proper server.
 
-The server accepts a JSON with a username, authentication token, and python code and will return the result. The Python code must had the desired data stored in a variable called `result`
+The server accepts a JSON with a username, authentication token, and python code and will return the result. The Python code must have the desired data stored in a variable called `result`
 
 JSON Format
 
