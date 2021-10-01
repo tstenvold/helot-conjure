@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
-from server import start_server
+
 import sys
 import os
 import py
 import messages
 import pytest
 import socket
-from pyserverless import handle_args
-import database
-import subprocess
 
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
 PSIZE = 2048
 
-server_path = py.path.local(__file__).dirpath("server.sh")
+'''server_path = py.path.local(__file__).dirpath("server.sh")
 server = subprocess.Popen([server_path])
 
 
@@ -28,7 +25,7 @@ def test_createdb():
     database.initialize_DB()
     database.add_user("tester", "abc123")
     assert database.authenticate_user("tester", "abc123") == True
-    assert database.authenticate_user("nonuser", "123abc") == False
+    assert database.authenticate_user("nonuser", "123abc") == False'''
 
 
 def test_basic():
@@ -72,11 +69,6 @@ def test_disconnect():
 def test_longexec():
     assert sendString(
         '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult%=10"}') == "6"
-
-
-def test_endServer():
-    server.kill()
-    assert server.returncode != None
 
 
 def sendString(text):

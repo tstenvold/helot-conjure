@@ -9,7 +9,7 @@ from os import ftruncate
 from json.decoder import JSONDecodeError
 
 import messages
-import serverjson
+from json_request import json_request
 import database
 
 
@@ -84,11 +84,11 @@ def exec_sandbox(jCode):
 def json_process(data):
 
     try:
-        request = serverjson.jsonRequest(data)
+        request = json_request(data)
     except JSONDecodeError:
         return messages.INVALIDJSON
 
-    if database.authenticate_user(request.uName, request.aCode):
+    if database.authenticate_user(request.uName, request.authCode):
 
         sTime = time.time()
         procID = database.insert_new_proc(request.uName, sTime)

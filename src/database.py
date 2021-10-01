@@ -1,6 +1,7 @@
 import sqlite3
 from os import path
 import uuid
+import hashlib
 
 import messages
 
@@ -31,12 +32,14 @@ def initialize_DB():
 def add_user(uName, authCode):
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
+    hashedAuth = hashlib.sha256(authCode.encode()).hexdigest()
     cur.execute(
-        "INSERT INTO users (userName,authCode) VALUES (?,?)", (uName, authCode))
+        "INSERT INTO users (userName,authCode) VALUES (?,?)", (uName, hashedAuth))
     db_commit_close(con)
 
 
 def del_user(uName):
+    # needs to delete proccesses with userID
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
     cur.execute(
@@ -64,12 +67,12 @@ def get_id_user(uName):
     return result[0]
 
 
-def authenticate_user(uName, aCode):
+def authenticate_user(uName, authCode):
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
-
+    hashedAuth = hashlib.sha256(authCode.encode()).hexdigest()
     cur.execute(
-        """SELECT userName , authCode FROM users WHERE userName=? AND authCode=?""", (uName, aCode))
+        """SELECT userName , authCode FROM users WHERE userName=? AND authCode=?""", (uName, hashedAuth))
     result = cur.fetchone()
     con.close()
 
