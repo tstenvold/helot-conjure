@@ -38,8 +38,6 @@ def handle_args(argv):
     port = options.port
     psize = options.psize
     database.DBNAME = options.dbpath
-    print(database.DBNAME)
-    print(options.dbpath)
 
     if options.admin_welcome:
         admin_welcome()
