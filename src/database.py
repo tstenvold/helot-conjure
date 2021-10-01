@@ -8,6 +8,10 @@ import messages
 DBNAME = 'pyserverless.db'
 
 
+def hash_auth(authCode):
+    return hashlib.sha256(authCode.encode()).hexdigest()
+
+
 def db_commit_close(con):
     con.commit()
     con.close()
@@ -32,7 +36,8 @@ def initialize_DB():
 def add_user(uName, authCode):
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
-    hashedAuth = hashlib.sha256(authCode.encode()).hexdigest()
+    # Hash so that password isn't stored in plaintext in the db
+    hashedAuth = hash_auth(authCode)
     cur.execute(
         "INSERT INTO users (userName,authCode) VALUES (?,?)", (uName, hashedAuth))
     db_commit_close(con)
@@ -70,7 +75,8 @@ def get_id_user(uName):
 def authenticate_user(uName, authCode):
     con = sqlite3.connect(DBNAME)
     cur = con.cursor()
-    hashedAuth = hashlib.sha256(authCode.encode()).hexdigest()
+    # Hash the plain text password to match the database entry
+    hashedAuth = hash_auth(authCode)
     cur.execute(
         """SELECT userName , authCode FROM users WHERE userName=? AND authCode=?""", (uName, hashedAuth))
     result = cur.fetchone()
