@@ -3,9 +3,9 @@
 import json
 
 
-class jsonRequest:
+class json_request:
     def __init__(self, data):
-        self.jsonObj = self.textToJson(data)
+        self.__jsonObj = self.textToJson(data)
         self.jCode = self.jsonCode(self.jsonObj)
         self.uName = self.jsonUserName(self.jsonObj)
         self.aCode = self.jsonAuthToken(self.jsonObj)

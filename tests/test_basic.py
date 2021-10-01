@@ -15,8 +15,8 @@ HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
 PSIZE = 2048
 
-sPath = py.path.local(__file__).dirpath("server.sh")
-server = subprocess.Popen([sPath])
+server_path = py.path.local(__file__).dirpath("server.sh")
+server = subprocess.Popen([server_path])
 
 
 def test_nodb():
