@@ -1,3 +1,4 @@
 #!/usr/bin/env zsh
 
-python src/pyserverless.py 2> /dev/null
+./src/pyserverless.py & pytest
+pkill -P $$

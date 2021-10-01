@@ -35,8 +35,8 @@ def handle_args(argv):
     options = parser.parse_args()[0]
 
     ipaddr = options.ipaddr
-    port = options.port
-    psize = options.psize
+    port = int(options.port)
+    psize = int(options.psize)
     database.DBNAME = options.dbpath
 
     if options.admin_welcome:
