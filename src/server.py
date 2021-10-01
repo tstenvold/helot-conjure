@@ -4,22 +4,32 @@ import time
 import selectors
 import types
 import socket
+import ssl
 from RestrictedPython import compile_restricted, utility_builtins
 from os import ftruncate
 from json.decoder import JSONDecodeError
+import certifi
 
 import messages
 from json_request import json_request
 import database
 
+context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,)
+context.check_hostname = False
+context.load_cert_chain(certfile='localhost.pem')
+
 
 def accept_wrapper(sel, sock):
-    conn, addr = sock.accept()  # Should be ready to read
-    print('accepted connection from', addr)
-    conn.setblocking(False)
-    data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
-    events = selectors.EVENT_READ | selectors.EVENT_WRITE
-    sel.register(conn, events, data=data)
+    try:
+        conn, addr = sock.accept()  # Should be ready to read
+        print('accepted connection from', addr)
+        conn.setblocking(False)
+        data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
+        events = selectors.EVENT_READ | selectors.EVENT_WRITE
+        sel.register(conn, events, data=data)
+    except ssl.SSLError:
+        print(messages.SSLERROR)
+        return
 
 
 def service_connection(sel, key, mask, psize):
@@ -49,22 +59,26 @@ def service_connection(sel, key, mask, psize):
 
 
 def start_server(ip, port, psize):
+
     sel = selectors.DefaultSelector()
-    lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    lsock.bind((ip, port))
-    lsock.listen()
-    print('listening on', (ip, port))
-    lsock.setblocking(False)
-    sel.register(lsock, selectors.EVENT_READ, data=None)
 
-    while True:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
+        sock.bind((ip, port))
+        sock.listen()
+        print('listening on', (ip, port))
+        sock.setblocking(False)
 
-        events = sel.select(timeout=None)
-        for key, mask in events:
-            if key.data is None:
-                accept_wrapper(sel, key.fileobj)
-            else:
-                service_connection(sel, key, mask, psize)
+        with context.wrap_socket(sock, server_side=True) as ssock:
+
+            sel.register(ssock, selectors.EVENT_READ, data=None)
+
+            while True:
+                events = sel.select(timeout=10)
+                for key, mask in events:
+                    if key.data is None:
+                        accept_wrapper(sel, key.fileobj)
+                    else:
+                        service_connection(sel, key, mask, psize)
 
 
 def exec_sandbox(jCode):

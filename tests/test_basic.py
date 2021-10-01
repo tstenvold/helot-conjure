@@ -6,11 +6,15 @@ import py
 import messages
 import pytest
 import socket
+import ssl
+import certifi
 
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
 PSIZE = 2048
+
+context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
 
 '''server_path = py.path.local(__file__).dirpath("server.sh")
 server = subprocess.Popen([server_path])
@@ -71,28 +75,34 @@ def test_longexec():
         '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult%=10"}') == "6"
 
 
+def init_ssl_connection():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
+        context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+        with context.wrap_socket(sock, server_hostname=HOST) as ssock:
+            return ssock
+
+
 def sendString(text):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as con:
-        con.connect((HOST, PORT))
-        con.sendall(text.encode())
-        data = con.recv(PSIZE)
-        return data.decode()
+    ssock = init_ssl_connection()
+    ssock.connect((HOST, PORT))
+    ssock.sendall(text.encode())
+    data = ssock.recv(PSIZE)
+    return data.decode()
 
 
 def sendDisconnect(text):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as con:
-        con.connect((HOST, PORT))
-        con.sendall(text.encode())
-        con.close()
-        return
+    ssock = init_ssl_connection()
+    ssock.connect((HOST, PORT))
+    ssock.sendall(text.encode())
+    ssock.close()
+    return
 
 
 def sendJsonFile(filePath):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as con:
-        con.connect((HOST, PORT))
-        with open(filePath, "r") as f:
-            jText = f.read()
-
-        con.sendall(jText.encode())
-        data = con.recv(PSIZE)
-        return data.decode()
+    ssock = init_ssl_connection()
+    ssock.connect((HOST, PORT))
+    with open(filePath, "r") as f:
+        jText = f.read()
+    ssock.sendall(jText.encode())
+    data = ssock.recv(PSIZE)
+    return data.decode()

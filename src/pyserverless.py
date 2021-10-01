@@ -18,7 +18,7 @@ def cmd_parse(argv):
     parser.add_option("--dbadmin", dest="admin_welcome", action="store_true",
                       help="Start the database administrator",)
     parser.add_option("-i", "--ip",
-                      action="store_true", dest="ipaddr", default='127.0.0.1',
+                      action="store_true", dest="ipaddr", default='localhost',
                       help="Set the Server IP Address")
     parser.add_option("-p", "--port",
                       action="store_true", dest="port", default=12345,

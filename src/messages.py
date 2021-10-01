@@ -5,6 +5,7 @@ INVALIDJSON = "Invalid JSON format"
 INVALIDCODE = "Invalid Python Code"
 
 CONNERROR = "Connection Error, Terminating Connection"
+SSLERROR = "SSL Connection Error"
 
 STATE_START = "started"
 STATE_RUNNING = "running"
