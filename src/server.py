@@ -58,7 +58,6 @@ def start_server(ip, port, psize):
     sel.register(lsock, selectors.EVENT_READ, data=None)
 
     while True:
-
         events = sel.select(timeout=None)
         for key, mask in events:
             if key.data is None:

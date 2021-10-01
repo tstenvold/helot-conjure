@@ -5,7 +5,7 @@ import hashlib
 
 import messages
 
-DBNAME = 'pyserverless.db'
+DBNAME = "pyserverless.db"
 
 
 def hash_auth(authCode):
@@ -17,8 +17,8 @@ def db_commit_close(con):
     con.close()
 
 
-def initialize_DB():
-    con = sqlite3.connect(DBNAME)
+def initialize_DB(dbPath):
+    con = sqlite3.connect(dbPath)
     cur = con.cursor()
 
     # If for some reason called with existing tables, this will delete everything! Keep your wits or lose your data
