@@ -10,11 +10,12 @@ import ssl
 import certifi
 
 
-HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
+HOST = 'localhost'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
 PSIZE = 2048
 
-context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
+context = ssl.create_default_context()
+context.load_cert_chain(certfile="localhost.pem")
 
 '''server_path = py.path.local(__file__).dirpath("server.sh")
 server = subprocess.Popen([server_path])

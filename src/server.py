@@ -14,16 +14,13 @@ import messages
 from json_request import json_request
 import database
 
-context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,)
-context.check_hostname = False
-context.load_cert_chain(certfile='localhost.pem')
-
+context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+context.load_cert_chain(certfile="localhost.pem", keyfile="localhost.pem")
 
 def accept_wrapper(sel, sock):
     try:
         conn, addr = sock.accept()  # Should be ready to read
         print('accepted connection from', addr)
-        conn.setblocking(False)
         data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
         events = selectors.EVENT_READ | selectors.EVENT_WRITE
         sel.register(conn, events, data=data)
@@ -64,16 +61,16 @@ def start_server(ip, port, psize):
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
         sock.bind((ip, port))
-        sock.listen()
+        sock.listen(5)
         print('listening on', (ip, port))
-        sock.setblocking(False)
 
         with context.wrap_socket(sock, server_side=True) as ssock:
 
             sel.register(ssock, selectors.EVENT_READ, data=None)
 
             while True:
-                events = sel.select(timeout=10)
+                events = sel.select(timeout=None)
+
                 for key, mask in events:
                     if key.data is None:
                         accept_wrapper(sel, key.fileobj)
