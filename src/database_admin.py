@@ -5,49 +5,51 @@ from os import path
 import uuid
 
 import database
-from messages import DBA_WELCOME, DBA_ADDED, DBA_AUTH, DBA_DELETED, DBA_INIT, DBA_NAME, DBA_COMMANDS
+from messages import *
 
 
-def admin_welcome():
+def admin_welcome(dbObj):
     print("")
     print(DBA_WELCOME)
-    db_command()
+    db_command(dbObj)
 
 
-def db_command():
+def db_command(dbObj):
     print("")
     switcher = {
         '1': add_user,
         '2': del_user,
         '3': init_db,
-        'q': quit
+        'q': quit_gracefully
     }
     opt = input(DBA_COMMANDS)
-    func = switcher.get(opt, lambda: db_command)
+    func = switcher.get(opt, db_command)
     print("")
-    func()
+    func(dbObj)
+    db_command(dbObj)
+
+
+def quit_gracefully(dbObj):
+    quit()
 
 
 def get_name():
     return input(DBA_NAME)
 
 
-def init_db():
-    database.initialize_DB()
+def init_db(dbObj):
+    dbObj.initialize_DB(dbObj.path)
     print(DBA_INIT)
-    db_command()
 
 
-def add_user():
+def add_user(dbObj):
     uName = get_name()
     authCode = input(DBA_AUTH)
-    database.add_user(uName, authCode)
+    dbObj.add_user(uName, authCode)
     print(DBA_ADDED, uName)
-    db_command()
 
 
-def del_user():
+def del_user(dbObj):
     uName = get_name()
-    database.del_user(uName)
+    dbObj.del_user(uName)
     print(DBA_DELETED, uName)
-    db_command()

@@ -42,8 +42,9 @@ def handle_args(argv):
     serv = server.serverObj(host, port, size, db)
 
     if options.admin_welcome:
-        admin_welcome()
+        admin_welcome(db)
     else:
+        # server needs a database to operate
         if not path.isfile(db.path):
             return messages.ERROR_NODB
         else:
