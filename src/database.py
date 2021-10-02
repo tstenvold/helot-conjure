@@ -6,7 +6,7 @@ import hashlib
 import messages
 
 
-class database:
+class dbObj:
 
     def __init__(self, path):
         self.path = path
@@ -74,10 +74,7 @@ class database:
         result = cur.fetchone()
         con.close()
 
-        if result:
-            return True
-
-        return False
+        return True if result else False
 
     def insert_new_proc(self, uName, sTime):
         userID = self.get_id_user(uName)

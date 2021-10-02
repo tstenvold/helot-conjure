@@ -13,8 +13,8 @@ from json_request import json_request
 import database
 
 
-class server:
-    def __init__(self, host="localhost", port=12345, size=1024, db=database("pyserverless.db")):
+class serverObj:
+    def __init__(self, host="localhost", port=12345, size=1024, db=database.dbObj("pyserverless.db")):
         self.host = host
         self.port = port
         self.size = size
@@ -44,7 +44,7 @@ class server:
 
             if mask & selectors.EVENT_WRITE:
                 if data.outb:
-                    result = json_process(data.outb)
+                    result = self.json_process(data.outb)
                     # TODO should give a response rather than wait for process completition
                     sent = sock.send(result.encode())
                     # remove data from output when result is sent
@@ -53,7 +53,7 @@ class server:
         except:
             print(messages.CONNERROR)
 
-    def start_server(self):
+    def run(self):
         sel = selectors.DefaultSelector()
         lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         lsock.bind((self.host, self.port))
@@ -90,17 +90,17 @@ class server:
         except JSONDecodeError:
             return messages.INVALIDJSON
 
-        if database.authenticate_user(request.uName, request.authCode):
+        if self.db.authenticate_user(request.uName, request.authCode):
 
             sTime = time.time()
-            procID = database.insert_new_proc(request.uName, sTime)
+            procID = self.db.insert_new_proc(request.uName, sTime)
             result = self.exec_sandbox(request.jCode)
             fTime = time.time()
 
             if result == messages.INVALIDCODE:
-                database.crashed_proc(procID, fTime)
+                self.db.crashed_proc(procID, fTime)
             else:
-                database.finish_proc(procID, fTime)
+                self.db.finish_proc(procID, fTime)
         else:
             result = messages.INVALIDAUTH
 

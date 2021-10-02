@@ -6,7 +6,7 @@ from optparse import OptionParser
 
 import database
 from database_admin import admin_welcome
-from server import start_server
+import server
 import messages
 
 
@@ -34,18 +34,20 @@ def handle_args(argv):
     parser = cmd_parse(argv)
     options = parser.parse_args()[0]
 
-    ipaddr = options.ipaddr
+    host = options.ipaddr
     port = int(options.port)
-    psize = int(options.psize)
-    database.DBNAME = options.dbpath
+    size = int(options.psize)
+    db = database.dbObj(options.dbpath)
+
+    serv = server.serverObj(host, port, size, db)
 
     if options.admin_welcome:
         admin_welcome()
     else:
-        if not path.isfile(database.DBNAME):
+        if not path.isfile(db.path):
             return messages.ERROR_NODB
         else:
-            start_server(ipaddr, port, psize)
+            serv.run()
 
 
 if __name__ == "__main__":
