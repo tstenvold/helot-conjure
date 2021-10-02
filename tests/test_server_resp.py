@@ -79,6 +79,7 @@ def test_image_rotate():
         con.connect((HOST, PORT))
         file = open("client/image_manipulation.py").read()
 
+        #Get the image and rotate yourself to check the server returns the correct image
         urllib.request.urlretrieve("https://opensource.com/sites/default/files/images/jupyter-image_7_0.png", "deer.jpg")
         img = Image.open("deer.jpg")
         result = img.rotate(90)
