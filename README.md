@@ -13,19 +13,18 @@ JSON Format
 }`
 
 ## Server
-The database needs to be configured first run with `--dbadmin` to initialize the database (option `3` then `1`)
-The server also requires a `localhost.pem` file to be located in the main directory. 
-Generate this file by running `openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout localhost.pem
+The database needs to be configured first run with `--dbadmin` to initialize the database (option `3` then `1`). The server also requires a `localhost.pem` file to be located in the main directory. Generate this file by running `openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout localhost.pem
 Generating a 1024 bit RSA private key`
 
 ## Client
-The client shows a basic example of how to connect, send a json and receive back the processed data
+The client shows a basic example of how to connect, send a json and receive back the processed data.
 The Advanced client shows a more involved example of sending a code snippet that returns an PIL Image Object
 
 ## Tests
 Tests currently only operate as client requests (server responses) but will in the future, test database aspects and server side etc.
 Tests should be run from the main directory with `pytest test/` 
-The test will purge the database and all info there will be lost.
+*The tests currently purge the database and all info there will be lost.*
+Tests can also be run without a server running by using the script `./tests/run_tests.sh
 
 ## Current Problems
 - Sandboxed run environment is laughable, so this only works for trusted request (see next point)
