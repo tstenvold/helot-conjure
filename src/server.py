@@ -7,6 +7,7 @@ import socket
 from RestrictedPython import compile_restricted, utility_builtins
 from os import ftruncate
 from json.decoder import JSONDecodeError
+import pickle
 
 import messages
 from json_request import json_request
@@ -14,7 +15,7 @@ import database
 
 
 class serverObj:
-    def __init__(self, host="localhost", port=12345, size=1024, db=database.dbObj("pyserverless.db")):
+    def __init__(self, host="localhost", port=12345, size=2048, db=database.dbObj("pyserverless.db")):
         self.host = host
         self.port = port
         self.size = size
@@ -23,18 +24,18 @@ class serverObj:
     def accept_wrapper(self, sel, sock):
         conn, addr = sock.accept()  # Should be ready to read
         print('accepted connection from', addr)
-        conn.setblocking(False)
+        #conn.setblocking(False)
         data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
         events = selectors.EVENT_READ | selectors.EVENT_WRITE
         sel.register(conn, events, data=data)
 
-    def service_connection(self, sel, key, mask, psize):
+    def service_connection(self, sel, key, mask):
         sock = key.fileobj
         data = key.data
 
         try:
             if mask & selectors.EVENT_READ:
-                recv_data = sock.recv(psize)  # Should be ready to read
+                recv_data = sock.recv(self.size)  # Should be ready to read
                 if recv_data:
                     data.outb += recv_data
                 else:
@@ -45,8 +46,9 @@ class serverObj:
             if mask & selectors.EVENT_WRITE:
                 if data.outb:
                     result = self.json_process(data.outb)
+                    serialized = pickle.dumps(result)
                     # TODO should give a response rather than wait for process completition
-                    sent = sock.send(result.encode())
+                    sent = sock.sendall(serialized)
                     # remove data from output when result is sent
                     data.outb = ''
 
@@ -59,7 +61,7 @@ class serverObj:
         lsock.bind((self.host, self.port))
         lsock.listen()
         print('listening on', (self.host, self.port))
-        lsock.setblocking(False)
+        #lsock.setblocking(False)
         sel.register(lsock, selectors.EVENT_READ, data=None)
 
         while True:
@@ -68,7 +70,7 @@ class serverObj:
                 if key.data is None:
                     self.accept_wrapper(sel, key.fileobj)
                 else:
-                    self.service_connection(sel, key, mask, self.size)
+                    self.service_connection(sel, key, mask)
 
     def exec_sandbox(self, jCode):
         result = ''
@@ -77,7 +79,7 @@ class serverObj:
             byte_code = compile(
                 jCode, filename='<inline code>', mode='exec')
             exec(byte_code, None, ex_locals)
-            result = str(ex_locals['result'])
+            result = ex_locals['result']
         except:
             result = messages.INVALIDCODE
 
