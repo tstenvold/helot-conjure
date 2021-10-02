@@ -4,9 +4,9 @@ from os import path
 import sys
 from optparse import OptionParser
 
-from database import DBNAME
+import database
 from database_admin import admin_welcome
-from server import start_server
+import server
 import messages
 
 
@@ -17,15 +17,14 @@ def cmd_parse(argv):
 
     parser.add_option("--dbadmin", dest="admin_welcome", action="store_true",
                       help="Start the database administrator",)
-    parser.add_option("-i", "--ip",
-                      action="store_true", dest="ipaddr", default='localhost',
+    parser.add_option("-i", "--ip", dest="ipaddr", default='127.0.0.1',
                       help="Set the Server IP Address")
-    parser.add_option("-p", "--port",
-                      action="store_true", dest="port", default=12345,
+    parser.add_option("-p", "--port", dest="port", default=12345,
                       help="Set the Server Port")
-    parser.add_option("-s", "--packet-size",
-                      action="store_true", dest="psize", default=2048,
+    parser.add_option("-s", "--packet-size", dest="psize", default=2048,
                       help="Set the Packet Size")
+    parser.add_option("-d", "--database", dest="dbpath", default="pyserverless.db",
+                      help="Set the database file location")
 
     return parser
 
@@ -35,17 +34,21 @@ def handle_args(argv):
     parser = cmd_parse(argv)
     options = parser.parse_args()[0]
 
-    ipaddr = options.ipaddr
-    port = options.port
-    psize = options.psize
+    host = options.ipaddr
+    port = int(options.port)
+    size = int(options.psize)
+    db = database.dbObj(options.dbpath)
+
+    serv = server.serverObj(host, port, size, db)
 
     if options.admin_welcome:
-        admin_welcome()
+        admin_welcome(db)
     else:
-        if not path.isfile(DBNAME):
+        # server needs a database to operate
+        if not path.isfile(db.path):
             return messages.ERROR_NODB
         else:
-            start_server(ipaddr, port, psize)
+            serv.run()
 
 
 if __name__ == "__main__":

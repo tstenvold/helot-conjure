@@ -2,7 +2,7 @@
 
 A simple serverless implementation for offloading process intensive operations from embedded and mobile devices without having to maintain a proper server.
 
-The server accepts a JSON with a username, authentication token, and python code and will return the result. The Python code must had the desired data stored in a variable called `result`
+The server accepts a JSON with a username, authentication token, and python code and will return the result. The Python code must have the desired data stored in a variable called `result`
 
 JSON Format
 
@@ -16,7 +16,7 @@ JSON Format
 The database needs to be configured first run with `--dbadmin` to initialize the database (option `3` then `1`)
 
 ## Client
-The client shows a basic expample of how to connect, send a json and recieve back the processed data
+The client shows a basic example of how to connect, send a json and receive back the processed data
 
 ## Tests
 Tests currently only operate as client requests but will in the future, test database aspects and server side etc.

@@ -8,14 +8,16 @@ import pytest
 import socket
 import ssl
 import certifi
+import pickle
+from PIL import Image
+import urllib.request
+from io import BytesIO
 
 
 HOST = 'localhost'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
-PSIZE = 2048
+SIZE = 2048
 
-context = ssl.create_default_context()
-context.load_cert_chain(certfile="localhost.pem")
 
 '''server_path = py.path.local(__file__).dirpath("server.sh")
 server = subprocess.Popen([server_path])
@@ -34,11 +36,11 @@ def test_createdb():
 
 
 def test_basic():
-    assert sendJsonFile("tests/basic.json") == "10"
+    assert sendJsonFile("tests/basic.json") == 10
 
 
 def test_function():
-    assert sendJsonFile("tests/function.json") == "6"
+    assert sendJsonFile("tests/function.json") == 6
 
 
 def test_os_call():
@@ -73,22 +75,50 @@ def test_disconnect():
 
 def test_longexec():
     assert sendString(
-        '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult%=10"}') == "6"
+        '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult%=10"}') == 6
+
+def test_image_rotate():
+    ssock = init_ssl_connection()
+    ssock.connect((HOST, PORT))
+    file = open("client/image_manipulation.py").read()
+
+    #Get the image and rotate yourself to check the server returns the correct image
+    urllib.request.urlretrieve("https://opensource.com/sites/default/files/images/jupyter-image_7_0.png", "deer.jpg")
+    img = Image.open("deer.jpg")
+    result = img.rotate(90)
+
+    file = file.replace("\n", "\\n").replace('\"', '\\"')
+    json = '{ "userName":"tester" ,"authToken":"abc123" ,"Code":"'+file+'"}'
+    ssock.sendall(json.encode())
+
+    data = b''
+    i=0
+    while True:
+        chunk = ssock.recv(SIZE)
+        if len(chunk) < SIZE:
+            data += chunk
+            break
+        data += chunk
+    os.remove("deer.jpg")
+    assert result == pickle.loads(data)
 
 
 def init_ssl_connection():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0) as sock:
-        context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
-        with context.wrap_socket(sock, server_hostname=HOST) as ssock:
-            return ssock
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+    context.load_default_certs()
+    sock = socket.socket(socket.AF_INET)
+    return context.wrap_socket(sock, server_hostname=HOST)
 
 
 def sendString(text):
     ssock = init_ssl_connection()
     ssock.connect((HOST, PORT))
     ssock.sendall(text.encode())
-    data = ssock.recv(PSIZE)
-    return data.decode()
+    data = ssock.recv(SIZE)
+    ssock.close()
+    return pickle.loads(data)
 
 
 def sendDisconnect(text):
@@ -105,5 +135,6 @@ def sendJsonFile(filePath):
     with open(filePath, "r") as f:
         jText = f.read()
     ssock.sendall(jText.encode())
-    data = ssock.recv(PSIZE)
-    return data.decode()
+    data = ssock.recv(SIZE)
+    ssock.close()
+    return pickle.loads(data)
