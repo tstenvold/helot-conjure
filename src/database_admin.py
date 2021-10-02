@@ -24,8 +24,11 @@ def db_command(dbObj):
     }
     opt = input(DBA_COMMANDS)
     func = switcher.get(opt, db_command)
+
     print("")
     func(dbObj)
+
+    # loop the command prompt
     db_command(dbObj)
 
 
