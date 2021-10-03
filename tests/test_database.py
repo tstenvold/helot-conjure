@@ -37,6 +37,7 @@ def test_insert_users():
 
     assert len(db.list_users()) == 100
 
+def test_add_tester():
     #user important for server tests
     db.add_user("tester","abc123")
     assert db.authenticate_user("tester","abc123") == True

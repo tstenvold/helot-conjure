@@ -7,6 +7,8 @@ import types
 import socket
 import ssl
 import os
+import logging
+import sys
 from RestrictedPython import compile_restricted, utility_builtins
 from os import ftruncate
 from json.decoder import JSONDecodeError
@@ -16,6 +18,7 @@ import messages
 from json_request import json_request
 import database
 
+logging.basicConfig(stream=sys.stderr, level=logging.CRITICAL)
 class serverObj:
     def __init__(self, host="localhost", port=12345, size=2048, db=database.dbObj("pyserverless.db")):
         self.host = host
@@ -28,13 +31,13 @@ class serverObj:
     def accept_wrapper(self, sel, sock):
         try:
             conn, addr = sock.accept()  # Should be ready to read
-            print('accepted connection from', addr)
+            logging.info('accepted connection from', addr)
             #conn.setblocking(False)
             data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
             events = selectors.EVENT_READ | selectors.EVENT_WRITE
             sel.register(conn, events, data=data)
         except ssl.SSLError:
-            print(messages.SSLERROR)
+            logging.error(messages.SSLERROR)
             return
 
     def service_connection(self, sel, key, mask):
@@ -47,7 +50,7 @@ class serverObj:
                 if recv_data:
                     data.outb += recv_data
                 else:
-                    print('closing connection to', data.addr)
+                    logging.info('closing connection to', data.addr)
                     sel.unregister(sock)
                     sock.close()
 
@@ -61,7 +64,7 @@ class serverObj:
                     data.outb = ''
 
         except:
-            print(messages.CONNERROR)
+            logging.error(messages.CONNERROR)
 
     def run(self):
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -71,7 +74,7 @@ class serverObj:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.bind((self.host, self.port))
             sock.listen(5)
-            print('listening on', (self.host, self.port))
+            logging.info('listening on', (self.host, self.port))
 
             with context.wrap_socket(sock, server_side=True) as ssock:
                 sel.register(ssock, selectors.EVENT_READ, data=None)
