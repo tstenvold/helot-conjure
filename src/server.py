@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
+import sqlite3
 import time
 import selectors
 import types
 import socket
 import ssl
+import os
 from RestrictedPython import compile_restricted, utility_builtins
 from os import ftruncate
 from json.decoder import JSONDecodeError
@@ -20,6 +22,8 @@ class serverObj:
         self.port = port
         self.size = size
         self.db = db
+        if not os.path.exists(db.path):
+            raise sqlite3.DatabaseError
 
     def accept_wrapper(self, sel, sock):
         try:

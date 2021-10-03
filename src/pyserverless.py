@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 from os import path
+import sqlite3
 import sys
 from optparse import OptionParser
+import sqlite3
 
 import database
 from database_admin import admin_welcome
@@ -39,16 +41,14 @@ def handle_args(argv):
     size = int(options.psize)
     db = database.dbObj(options.dbpath)
 
-    serv = server.serverObj(host, port, size, db)
-
     if options.admin_welcome:
         admin_welcome(db)
     else:
-        # server needs a database to operate
-        if not path.isfile(db.path):
-            return messages.ERROR_NODB
-        else:
+        try:
+            serv = server.serverObj(host, port, size, db)
             serv.run()
+        except sqlite3.DatabaseError:
+            print(messages.ERROR_NODB)
 
 
 if __name__ == "__main__":

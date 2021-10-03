@@ -52,9 +52,8 @@ class dbObj:
         users = cur.execute(
             'SELECT userName FROM users ORDER BY userName DESC').fetchall()
         con.close()
-
-        print(users)
-
+        return users
+        
     def get_id_user(self, uName):
         con = sqlite3.connect(self.path)
         cur = con.cursor()
