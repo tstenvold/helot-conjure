@@ -1,39 +1,18 @@
 #!/usr/bin/env python3
 
-import sys
 import os
-import py
 import messages
-import pytest
+import pyserverless
 import socket
 import ssl
-import certifi
 import pickle
 from PIL import Image
 import urllib.request
-from io import BytesIO
 
 
 HOST = 'localhost'  # Standard loopback interface address (localhost)
 PORT = 12345        # Port to listen on (non-privileged ports are > 1023)
 SIZE = 2048
-
-
-'''server_path = py.path.local(__file__).dirpath("server.sh")
-server = subprocess.Popen([server_path])
-
-
-def test_nodb():
-    os.system("rm pyserverless.db")
-    assert handle_args([""]) == messages.ERROR_NODB
-
-
-def test_createdb():
-    database.initialize_DB()
-    database.add_user("tester", "abc123")
-    assert database.authenticate_user("tester", "abc123") == True
-    assert database.authenticate_user("nonuser", "123abc") == False'''
-
 
 def test_basic():
     assert sendJsonFile("tests/basic.json") == 10
