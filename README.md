@@ -21,10 +21,8 @@ The client shows a basic example of how to connect, send a json and receive back
 The Advanced client shows a more involved example of sending a code snippet that returns an PIL Image Object
 
 ## Tests
-Tests currently only operate as client requests (server responses) but will in the future, test database aspects and server side etc.
-Tests should be run from the main directory with `pytest test/` 
-*The tests currently purge the database and all info there will be lost.*
-Tests can also be run without a server running by using the script `./tests/run_tests.sh`
+Tests can be run without a server running by using the script `./tests/run_tests.sh`.
+The script runs the tests and also generates a coverage report html and displays the coverage results.
 
 ## Current Problems
 - Sandboxed run environment is laughable, so this only works for trusted request (see next point)
