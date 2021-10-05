@@ -2,7 +2,7 @@
 
 import os
 import messages
-import hconjure
+import json
 import socket
 import ssl
 import pickle
@@ -22,8 +22,9 @@ def test_forloop():
     assert sendJsonFile("tests/function.json") == 6
 
 def test_function():
+    code = "def xyz():\n\treturn 15\nresult = xyz()"
     assert sendString(
-        '{"userName": "tester","authToken": "abc123","Code": "def xyz():\\n\treturn 15\\nresult = xyz()"}') == 15
+        '{"userName": "tester","authToken": "abc123","Code": '+json.dumps(code)+'}') == 15
 
 
 def test_os_call():

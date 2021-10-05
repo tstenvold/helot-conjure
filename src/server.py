@@ -129,8 +129,7 @@ class serverObj:
                 jCode, filename='<inline code>', mode='exec')
             exec(byte_code, safe_globals, ex_locals)
             result = ex_locals['result']
-        except Exception as e: 
-            print(e)
+        except: 
             result = messages.INVALIDCODE
 
         return result
