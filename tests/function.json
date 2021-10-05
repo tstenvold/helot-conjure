@@ -1,5 +1,5 @@
 {
     "userName": "tester",
     "authToken": "abc123",
-    "Code": "result=2\nfor i in range (5,14):\n\tresult=result**i\nresult%=10"
+    "Code": "result=2\nfor i in range (5,14):\n\tresult=result**i\nresult=result % 10"
 }

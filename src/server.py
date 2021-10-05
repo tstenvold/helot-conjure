@@ -111,7 +111,6 @@ class serverObj:
         result = ''
         ex_locals = {}
 
-        safe_globals['__metaclass__'] = type
         safe_globals['__name__'] = 'restricted namespace'
         safe_globals['_getiter_'] = default_guarded_getiter
         safe_globals['_getitem_'] = default_guarded_getitem
@@ -121,9 +120,10 @@ class serverObj:
         try:
             byte_code = compile_restricted(
                 jCode, filename='<inline code>', mode='exec')
-            exec(byte_code,safe_globals, ex_locals)
+            exec(byte_code, safe_globals, ex_locals)
             result = ex_locals['result']
-        except:
+        except Exception as e: 
+            print(e)
             result = messages.INVALIDCODE
 
         return result

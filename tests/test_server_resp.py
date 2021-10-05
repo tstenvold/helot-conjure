@@ -18,8 +18,12 @@ def test_basic():
     assert sendJsonFile("tests/basic.json") == 10
 
 
-def test_function():
+def test_forloop():
     assert sendJsonFile("tests/function.json") == 6
+
+def test_function():
+    assert sendString(
+        '{"userName": "teste","authToken": "abc123","Code": "def xyz():\\n\treturn 15\\nresult = xyz()"}') == messages.INVALIDAUTH
 
 
 def test_os_call():
@@ -54,7 +58,7 @@ def test_disconnect():
 
 def test_longexec():
     assert sendString(
-        '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult%=10"}') == 6
+        '{"userName": "tester","authToken": "abc123","Code": "result=2\\nfor i in range (6,15):\\n\\tresult=result**i\\nresult= result % 10"}') == 6
 
 def test_image_rotate():
     ssock = init_ssl_connection()
