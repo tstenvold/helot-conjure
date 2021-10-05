@@ -70,7 +70,13 @@ class serverObj:
         except:
             logging.error(messages.CONNERROR)
 
-    def run(self):
+    def server_timeout(self, test,timeout):
+        if test and time.time() - timeout >= 3:
+            return False
+        else:
+            return True
+
+    def run(self,tout=False):
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         context.load_cert_chain(certfile=self.cert, keyfile=self.cert)
         
@@ -83,13 +89,16 @@ class serverObj:
             with context.wrap_socket(sock, server_side=True) as ssock:
                 sel.register(ssock, selectors.EVENT_READ, data=None)
 
-                while True:
-                    events = sel.select(timeout=None)
+                ltime = time.time()
+                while self.server_timeout(tout,ltime):
+                    
+                    events = sel.select(timeout=1 if tout else None)
                     for key, mask in events:
                         if key.data is None:
                             self.accept_wrapper(sel, key.fileobj)
                         else:
                             self.service_connection(sel, key, mask)
+                            ltime = time.time()
 
 
     def exec_sandbox(self, jCode):

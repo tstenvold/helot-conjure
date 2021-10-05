@@ -3,7 +3,7 @@
 from os import path
 import sqlite3
 import sys
-from optparse import OptionParser
+from optparse import OptionParser, SUPPRESS_HELP
 import sqlite3
 
 import database
@@ -18,7 +18,7 @@ def cmd_parse(argv):
         usage="usage: pyserverless.py [options]", version="%prog 0.1")
 
     parser.add_option("--dbadmin", dest="admin_welcome", action="store_true",
-                      help="Start the database administrator",)
+                      help="Start the database administrator")
     parser.add_option("-i", "--ip", dest="ipaddr", default='127.0.0.1',
                       help="Set the Server IP Address")
     parser.add_option("-p", "--port", dest="port", default=12345,
@@ -29,6 +29,8 @@ def cmd_parse(argv):
                       help="Set the database file location")
     parser.add_option("--cert", dest="certpath", default="certificate.pem",
                       help="Set the certificate file location")
+    parser.add_option("--test", dest="test", action="store_true",
+                      help=SUPPRESS_HELP,)
 
     return parser
 
@@ -43,13 +45,14 @@ def handle_args(argv):
     size = int(options.psize)
     db = database.dbObj(options.dbpath)
     cert = options.certpath
+    timeout = True if options.test else False
 
     if options.admin_welcome:
         admin_welcome(db)
     else:
         try:
             serv = server.serverObj(host, port, size, db, cert)
-            serv.run()
+            serv.run(timeout)
         except sqlite3.DatabaseError:
             print(messages.ERROR_NODB)
 
