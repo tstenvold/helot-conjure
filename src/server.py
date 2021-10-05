@@ -9,14 +9,19 @@ import ssl
 import os
 import logging
 import sys
-from RestrictedPython import compile_restricted, utility_builtins
 from os import ftruncate
 from json.decoder import JSONDecodeError
 import pickle
 
+from RestrictedPython import compile_restricted,safe_globals
+from RestrictedPython.Eval import default_guarded_getiter,default_guarded_getitem
+from RestrictedPython.Guards import guarded_iter_unpack_sequence,safer_getattr
+
 import messages
 from json_request import json_request
 import database
+
+
 class serverObj:
 
     logging.basicConfig(stream=sys.stderr, level=logging.CRITICAL)
@@ -36,7 +41,7 @@ class serverObj:
         try:
             conn, addr = sock.accept()  # Should be ready to read
             logging.info('accepted connection from', addr)
-            #conn.setblocking(False)
+
             data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
             events = selectors.EVENT_READ | selectors.EVENT_WRITE
             sel.register(conn, events, data=data)
@@ -77,6 +82,7 @@ class serverObj:
             return True
 
     def run(self,tout=False):
+
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         context.load_cert_chain(certfile=self.cert, keyfile=self.cert)
         
@@ -104,10 +110,18 @@ class serverObj:
     def exec_sandbox(self, jCode):
         result = ''
         ex_locals = {}
+
+        safe_globals['__metaclass__'] = type
+        safe_globals['__name__'] = 'restricted namespace'
+        safe_globals['_getiter_'] = default_guarded_getiter
+        safe_globals['_getitem_'] = default_guarded_getitem
+        safe_globals['_iter_unpack_sequence_'] = guarded_iter_unpack_sequence
+        safe_globals['getattr'] = safer_getattr
+
         try:
-            byte_code = compile(
+            byte_code = compile_restricted(
                 jCode, filename='<inline code>', mode='exec')
-            exec(byte_code, None, ex_locals)
+            exec(byte_code,safe_globals, ex_locals)
             result = ex_locals['result']
         except:
             result = messages.INVALIDCODE
