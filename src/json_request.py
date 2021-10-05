@@ -21,6 +21,3 @@ class json_request:
 
     def textToJson(self, txtjson):
         return json.loads(txtjson)
-
-    def serialize_result(self, result):
-        return json.dumps(result)
