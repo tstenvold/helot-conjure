@@ -17,16 +17,20 @@ import pickle
 import messages
 from json_request import json_request
 import database
-
-logging.basicConfig(stream=sys.stderr, level=logging.CRITICAL)
 class serverObj:
-    def __init__(self, host="localhost", port=12345, size=2048, db=database.dbObj("pyserverless.db")):
+
+    logging.basicConfig(stream=sys.stderr, level=logging.CRITICAL)
+
+    def __init__(self, host="localhost", port=12345, size=2048, db=database.dbObj("hconjure.db"),cert="certificate.pem"):
         self.host = host
         self.port = port
         self.size = size
+        self.cert = cert
         self.db = db
         if not os.path.exists(db.path):
             raise sqlite3.DatabaseError
+        if not os.path.exists(cert):
+            raise "SSL Ceritifcate not found"
 
     def accept_wrapper(self, sel, sock):
         try:
@@ -68,7 +72,7 @@ class serverObj:
 
     def run(self):
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-        context.load_cert_chain(certfile="localhost.pem", keyfile="localhost.pem")
+        context.load_cert_chain(certfile=self.cert, keyfile=self.cert)
         
         sel = selectors.DefaultSelector()
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:

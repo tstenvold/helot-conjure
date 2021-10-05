@@ -27,6 +27,8 @@ def cmd_parse(argv):
                       help="Set the Packet Size")
     parser.add_option("-d", "--database", dest="dbpath", default="hconjure.db",
                       help="Set the database file location")
+    parser.add_option("--cert", dest="certpath", default="certificate.pem",
+                      help="Set the certificate file location")
 
     return parser
 
@@ -40,12 +42,13 @@ def handle_args(argv):
     port = int(options.port)
     size = int(options.psize)
     db = database.dbObj(options.dbpath)
+    cert = options.certpath
 
     if options.admin_welcome:
         admin_welcome(db)
     else:
         try:
-            serv = server.serverObj(host, port, size, db)
+            serv = server.serverObj(host, port, size, db, cert)
             serv.run()
         except sqlite3.DatabaseError:
             print(messages.ERROR_NODB)

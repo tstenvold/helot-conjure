@@ -13,7 +13,7 @@ JSON Format
 }`
 
 ## Server
-The database needs to be configured first run with `--dbadmin` to initialize the database (option `3` then `1`). The server also requires a `localhost.pem` file to be located in the main directory. Generate this file by running `openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout localhost.pem
+The database needs to be configured first run with `--dbadmin` to initialize the database (option `3` then `1`). The server also requires a `localhost.pem` file to be located in the main directory. Generate this file by running `openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout certificate.pem
 Generating a 1024 bit RSA private key`
 
 ## Client
