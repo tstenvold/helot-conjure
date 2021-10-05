@@ -6,7 +6,7 @@ import database_admin
 from faker import Faker
 import time
 import random
-import pyserverless
+import hconjure
 import messages
 fake = Faker()
 
@@ -37,11 +37,6 @@ def test_insert_users():
 
     assert len(db.list_users()) == 100
 
-def test_add_tester():
-    #user important for server tests
-    db.add_user("tester","abc123")
-    assert db.authenticate_user("tester","abc123") == True
-
 def test_delete_users():
     users = db.list_users()
     deluser = []
@@ -53,3 +48,8 @@ def test_delete_users():
     nusers = db.list_users()
     for name, in nusers:
         assert name not in deluser
+
+def test_add_tester():
+    #user important for server tests
+    db.add_user("tester","abc123")
+    assert db.authenticate_user("tester","abc123") == True

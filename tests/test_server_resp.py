@@ -2,7 +2,7 @@
 
 import os
 import messages
-import pyserverless
+import hconjure
 import socket
 import ssl
 import pickle
