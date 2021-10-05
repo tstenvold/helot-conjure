@@ -1,6 +1,6 @@
-# pyserverless
+# Helot Conjure
 
-A simple standalone serverless implementation for offloading process intensive operations from embedded and mobile devices without having to maintain a proper server.
+A simple standalone SSL serverless implementation in Python for offloading process intensive operations from embedded and mobile devices without having to maintain a full server.
 
 The server accepts a JSON with a username, authentication code, and python code and will return the result. The Python code must have the desired data stored in a variable called `result`
 
