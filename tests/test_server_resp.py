@@ -23,7 +23,7 @@ def test_forloop():
 
 def test_function():
     assert sendString(
-        '{"userName": "teste","authToken": "abc123","Code": "def xyz():\\n\treturn 15\\nresult = xyz()"}') == messages.INVALIDAUTH
+        '{"userName": "tester","authToken": "abc123","Code": "def xyz():\\n\treturn 15\\nresult = xyz()"}') == 15
 
 
 def test_os_call():

@@ -16,6 +16,8 @@ import pickle
 from RestrictedPython import compile_restricted,safe_globals
 from RestrictedPython.Eval import default_guarded_getiter,default_guarded_getitem
 from RestrictedPython.Guards import guarded_iter_unpack_sequence,safer_getattr
+from PIL import Image
+import urllib.request
 
 import messages
 from json_request import json_request
@@ -111,11 +113,16 @@ class serverObj:
         result = ''
         ex_locals = {}
 
+        #Sandbox envs
         safe_globals['__name__'] = 'restricted namespace'
         safe_globals['_getiter_'] = default_guarded_getiter
         safe_globals['_getitem_'] = default_guarded_getitem
         safe_globals['_iter_unpack_sequence_'] = guarded_iter_unpack_sequence
         safe_globals['getattr'] = safer_getattr
+
+        #Sanbox import modules
+        safe_globals['Image'] = Image
+        safe_globals['request'] = urllib.request
 
         try:
             byte_code = compile_restricted(
