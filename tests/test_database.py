@@ -2,12 +2,16 @@
 
 import os
 import database
-import database_admin
+import database_admin as dbadmin
 from faker import Faker
 import time
 import random
-import hconjure
 import messages
+import io
+import pytest
+from pytest import MonkeyPatch
+
+
 fake = Faker()
 
 dbpath = "test.db"
@@ -53,3 +57,21 @@ def test_add_tester():
     #user important for server tests
     db.add_user("tester","abc123")
     assert db.authenticate_user("tester","abc123") == True
+
+def test_db_admin_add_user(capsys):
+    input_values = ['1', 'tester123', 'password' , "q"]
+ 
+    def mock_input(s):
+        return input_values.pop(0)
+
+    dbadmin.input = mock_input
+
+    with pytest.raises(SystemExit):
+        dbadmin.admin_welcome(db)
+
+    out, err = capsys.readouterr()
+
+    assert db.authenticate_user("tester","abc123") == True 
+
+
+    
