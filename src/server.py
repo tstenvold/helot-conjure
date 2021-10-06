@@ -13,15 +13,10 @@ from os import ftruncate
 from json.decoder import JSONDecodeError
 import pickle
 
-from RestrictedPython import compile_restricted,safe_globals
-from RestrictedPython.Eval import default_guarded_getiter,default_guarded_getitem
-from RestrictedPython.Guards import guarded_iter_unpack_sequence,safer_getattr
-from PIL import Image
-import urllib.request
-
 import messages
 from json_request import json_request
 import database
+import sandbox
 
 
 class serverObj:
@@ -108,32 +103,6 @@ class serverObj:
                             self.service_connection(sel, key, mask)
                             ltime = time.time()
 
-
-    def exec_sandbox(self, jCode):
-        result = ''
-        ex_locals = {}
-
-        #Sandbox envs
-        safe_globals['__name__'] = 'restricted namespace'
-        safe_globals['_getiter_'] = default_guarded_getiter
-        safe_globals['_getitem_'] = default_guarded_getitem
-        safe_globals['_iter_unpack_sequence_'] = guarded_iter_unpack_sequence
-        safe_globals['getattr'] = safer_getattr
-
-        #Sanbox import modules
-        safe_globals['Image'] = Image
-        safe_globals['request'] = urllib.request
-
-        try:
-            byte_code = compile_restricted(
-                jCode, filename='<inline code>', mode='exec')
-            exec(byte_code, safe_globals, ex_locals)
-            result = ex_locals['result']
-        except: 
-            result = messages.INVALIDCODE
-
-        return result
-
     def json_process(self, data):
 
         try:
@@ -145,7 +114,7 @@ class serverObj:
 
             sTime = time.time()
             procID = self.db.insert_new_proc(request.uName, sTime)
-            result = self.exec_sandbox(request.jCode)
+            result = sandbox.run_code(request.jCode)
             fTime = time.time()
 
             if result == messages.INVALIDCODE:
