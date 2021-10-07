@@ -7,9 +7,10 @@ from faker import Faker
 import time
 import random
 import messages
-import io
+import server
 import pytest
-from pytest import MonkeyPatch
+import ssl
+import sqlite3
 
 
 fake = Faker()
@@ -24,6 +25,20 @@ def gen_fake_users():
         users.append((fake.first_name(),fake.ssn()))
     
     return users
+
+def test_no_db():
+    nodb = database.dbObj("nodb.db")
+    with pytest.raises(sqlite3.DatabaseError):
+        server.serverObj("localhost", 12345, 2048, nodb, "certificate.pem")
+
+def test_no_cert():
+    #ensure the cert doesn't exist
+    certPath = "nocert.pem"
+    if os.path.isfile(certPath):
+        os.remove(certPath)
+    
+    with pytest.raises(ssl.CertificateError):
+        server.serverObj("localhost", 12345, 2048, db, certPath) == ssl.CertificateError
 
 def test_createdb():
     db.initialize_DB(db.path)
@@ -58,9 +73,7 @@ def test_add_tester():
     db.add_user("tester","abc123")
     assert db.authenticate_user("tester","abc123") == True
 
-def test_db_admin_add_user(capsys):
-    input_values = ['1', 'tester123', 'password' , "q"]
- 
+def run_db_admin_inputs(capsys,input_values):
     def mock_input(s):
         return input_values.pop(0)
 
@@ -69,9 +82,25 @@ def test_db_admin_add_user(capsys):
     with pytest.raises(SystemExit):
         dbadmin.admin_welcome(db)
 
-    out, err = capsys.readouterr()
+    return capsys.readouterr()
 
-    assert db.authenticate_user("tester","abc123") == True 
+def test_db_admin_add_user(capsys):
+    input_values = ['1', 'tester123', 'password' , "q"]
+    lenbefore = len(db.list_users())
+    out, err = run_db_admin_inputs(capsys,input_values)
+    lenafter = len(db.list_users())
 
+    assert db.authenticate_user("tester123","password") == True
+    assert lenafter == lenbefore+1
+
+def test_db_admin_del_user(capsys):
+
+    input_values = ['2', 'tester123' , "q"]
+    lenbefore = len(db.list_users())
+    out, err = run_db_admin_inputs(capsys,input_values)
+    lenafter = len(db.list_users())
+
+    assert db.authenticate_user("tester123","password") == False
+    assert lenafter == lenbefore-1
 
     
