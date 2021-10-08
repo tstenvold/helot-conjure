@@ -17,7 +17,7 @@ The database needs to be configured first run with `--dbadmin` to initialize the
 Generating a 1024 bit RSA private key`
 ## Client
 The client shows a basic example of how to connect, send a json and receive back the processed data.
-The Advanced client shows a more involved example of sending a code snippet that returns an PIL Image Object
+The Advanced client shows a more involved example of sending a code snippet that returns a modified PIL Image Object.
 
 ## Tests
 Tests can be run without a server running by using the script `./tests/run_tests.sh`.
