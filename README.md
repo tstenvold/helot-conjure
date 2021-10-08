@@ -24,5 +24,5 @@ Tests can be run without a server running by using the script `./tests/run_tests
 The script runs the tests and also generates a coverage report html and displays the coverage results.
 
 ## Current Problems
-- Sandboxed run environment is laughable, so this only works for trusted request (see next point)
+- Sandboxed run environment is laughable, so this only works for trusted request.
 - Likely in the future the server will respond with a process id instead of returning the execution result itself. This will allow the process to run long without threat of timing out the connection and then allow the client to request the result multiple times.
