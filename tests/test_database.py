@@ -2,12 +2,18 @@
 
 import os
 import database
-import database_admin
+import database_admin as dbadmin
 from faker import Faker
 import time
 import random
-import hconjure
 import messages
+import server
+import pytest
+import ssl
+import sqlite3
+import filecmp
+
+
 fake = Faker()
 
 dbpath = "test.db"
@@ -21,9 +27,32 @@ def gen_fake_users():
     
     return users
 
+def test_no_db():
+    nodb = database.dbObj("nodb.db")
+    with pytest.raises(sqlite3.DatabaseError):
+        server.serverObj("localhost", 12345, 2048, nodb, "certificate.pem")
+
 def test_createdb():
+
+    admindb = "test1.db"
+
     db.initialize_DB(db.path)
+    dbadmin.init_db(database.dbObj(admindb))
+
+    #both db initialized differently and exist.
     assert os.path.isfile(dbpath)
+    assert os.path.isfile(admindb)
+    #dbs'  tested are the same content
+    #assert filecmp.cmp(dbpath,admindb)
+
+def test_no_cert():
+    #ensure the cert doesn't exist
+    certPath = "nocert.pem"
+    if os.path.isfile(certPath):
+        os.remove(certPath)
+    
+    with pytest.raises(ssl.CertificateError):
+        server.serverObj("localhost", 12345, 2048, db, certPath) == ssl.CertificateError
 
 def test_insert_users():
     fusers = gen_fake_users()
@@ -53,3 +82,35 @@ def test_add_tester():
     #user important for server tests
     db.add_user("tester","abc123")
     assert db.authenticate_user("tester","abc123") == True
+
+def run_db_admin_inputs(capsys,input_values):
+    def mock_input(s):
+        return input_values.pop(0)
+
+    dbadmin.input = mock_input
+
+    with pytest.raises(SystemExit):
+        dbadmin.admin_welcome(db)
+
+    return capsys.readouterr()
+
+def test_db_admin_add_user(capsys):
+    input_values = ['1', 'tester123', 'password' , "q"]
+    lenbefore = len(db.list_users())
+    out, err = run_db_admin_inputs(capsys,input_values)
+    lenafter = len(db.list_users())
+
+    assert db.authenticate_user("tester123","password") == True
+    assert lenafter == lenbefore+1
+
+def test_db_admin_del_user(capsys):
+
+    input_values = ['2', 'tester123' , "q"]
+    lenbefore = len(db.list_users())
+    out, err = run_db_admin_inputs(capsys,input_values)
+    lenafter = len(db.list_users())
+
+    assert db.authenticate_user("tester123","password") == False
+    assert lenafter == lenbefore-1
+
+    

@@ -32,7 +32,7 @@ class serverObj:
         if not os.path.exists(db.path):
             raise sqlite3.DatabaseError
         if not os.path.exists(cert):
-            raise "SSL Ceritifcate not found"
+            raise ssl.CertificateError
 
     def accept_wrapper(self, sel, sock):
         try:

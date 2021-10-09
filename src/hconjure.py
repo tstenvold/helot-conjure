@@ -34,7 +34,6 @@ def cmd_parse(argv):
 
     return parser
 
-
 def handle_args(argv):
 
     parser = cmd_parse(argv)
@@ -53,7 +52,7 @@ def handle_args(argv):
         try:
             serv = server.serverObj(host, port, size, db, cert)
             serv.run(timeout)
-        except sqlite3.DatabaseError:
+        except:
             print(messages.ERROR_NODB)
 
 

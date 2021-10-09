@@ -13,6 +13,7 @@ STATE_FINISHED = "finished"
 STATE_ERROR = "did not finish"
 
 ERROR_NODB = "Database does not exist.\nPlease run with --dbadmin first"
+ERROR_NOCERT ="SSL Certificate does not exist, please create one first"
 ERROR_DBCORRUPT = "Database tables are corrupt.\nPlease recreate the database using --dbadmin"
 
 DBA_WELCOME = "## PyServerless Database Admin Tool ##"
