@@ -11,6 +11,7 @@ import server
 import pytest
 import ssl
 import sqlite3
+import filecmp
 
 
 fake = Faker()
@@ -31,6 +32,19 @@ def test_no_db():
     with pytest.raises(sqlite3.DatabaseError):
         server.serverObj("localhost", 12345, 2048, nodb, "certificate.pem")
 
+def test_createdb():
+
+    admindb = "test1.db"
+
+    db.initialize_DB(db.path)
+    dbadmin.init_db(database.dbObj(admindb))
+
+    #both db initialized differently and exist.
+    assert os.path.isfile(dbpath)
+    assert os.path.isfile(admindb)
+    #dbs'  tested are the same content
+    #assert filecmp.cmp(dbpath,admindb)
+
 def test_no_cert():
     #ensure the cert doesn't exist
     certPath = "nocert.pem"
@@ -39,10 +53,6 @@ def test_no_cert():
     
     with pytest.raises(ssl.CertificateError):
         server.serverObj("localhost", 12345, 2048, db, certPath) == ssl.CertificateError
-
-def test_createdb():
-    db.initialize_DB(db.path)
-    assert os.path.isfile(dbpath)
 
 def test_insert_users():
     fusers = gen_fake_users()
