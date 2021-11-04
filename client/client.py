@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import socket
+import pickle
 import ssl
 import certifi
 
@@ -20,4 +21,4 @@ data = conn.recv(1024)
 conn.close()
 
 print('Sent Json Successfully')
-print("Received: ", repr(data))
+print("Received: ", repr(pickle.loads(data)))
