@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 
-from os import path
-import sqlite3
 import sys
 from optparse import OptionParser, SUPPRESS_HELP
-import sqlite3
 
 import database
 from database_admin import admin_welcome

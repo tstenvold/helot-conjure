@@ -6,12 +6,10 @@ import database_admin as dbadmin
 from faker import Faker
 import time
 import random
-import messages
 import server
 import pytest
 import ssl
 import sqlite3
-import filecmp
 
 
 fake = Faker()

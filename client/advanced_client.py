@@ -3,8 +3,6 @@
 import socket
 import pickle
 import ssl
-from PIL import Image
-import io
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 12345        # The port used by the server
