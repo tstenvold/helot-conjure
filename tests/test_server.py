@@ -54,7 +54,7 @@ def test_invalidCode():
 def test_disconnect():
     # this should ideally read sever side output
     assert sendDisconnect(
-        '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') == None
+        '{"userName": "teste","authToken": "abc123","Code": "result = 2+2*4"}') is None
 
 
 def test_longexec():

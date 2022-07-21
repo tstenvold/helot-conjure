@@ -61,8 +61,8 @@ def test_insert_users():
     
     for i in range(3):
         n = random.randint(0,99)
-        assert db.authenticate_user(fusers[n][0], fusers[n][1]) == True
-        assert db.authenticate_user(fusers[n][1], fusers[n][0]) == False
+        assert db.authenticate_user(fusers[n][0], fusers[n][1]) is True
+        assert db.authenticate_user(fusers[n][1], fusers[n][0]) is False
 
     assert len(db.list_users()) == 100
 
@@ -81,7 +81,7 @@ def test_delete_users():
 def test_add_tester():
     #user important for server tests
     db.add_user("tester","abc123")
-    assert db.authenticate_user("tester","abc123") == True
+    assert db.authenticate_user("tester","abc123") is True
 
 def run_db_admin_inputs(capsys,input_values):
     def mock_input(s):
@@ -100,7 +100,7 @@ def test_db_admin_add_user(capsys):
     out, err = run_db_admin_inputs(capsys,input_values)
     lenafter = len(db.list_users())
 
-    assert db.authenticate_user("tester123","password") == True
+    assert db.authenticate_user("tester123","password") is True
     assert lenafter == lenbefore+1
 
 def test_db_admin_del_user(capsys):
@@ -110,7 +110,7 @@ def test_db_admin_del_user(capsys):
     out, err = run_db_admin_inputs(capsys,input_values)
     lenafter = len(db.list_users())
 
-    assert db.authenticate_user("tester123","password") == False
+    assert db.authenticate_user("tester123","password") is False
     assert lenafter == lenbefore-1
 
     
