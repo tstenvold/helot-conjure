@@ -110,7 +110,6 @@ def sendDisconnect(text):
     ssock.connect((HOST, PORT))
     ssock.sendall(text.encode())
     ssock.close()
-    return
 
 
 def sendJsonFile(filePath):
