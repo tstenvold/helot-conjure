@@ -10,14 +10,19 @@ class json_request:
         self.uName = self.jsonUserName(self._jsonObj)
         self.authCode = self.jsonAuthToken(self._jsonObj)
 
-    def jsonAuthToken(self, jsonObj):
+    @staticmethod
+    def jsonAuthToken(jsonObj):
         return jsonObj["authToken"]
 
-    def jsonUserName(self, jsonObj):
+    @staticmethod
+    def jsonUserName(jsonObj):
         return jsonObj["userName"]
 
-    def jsonCode(self, jsonObj):
+    @staticmethod
+    @staticmethod
+    def jsonCode(jsonObj):
         return jsonObj["Code"]
 
-    def textToJson(self, txtjson):
+    @staticmethod
+    def textToJson(txtjson):
         return json.loads(txtjson)
