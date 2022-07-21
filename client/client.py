@@ -3,7 +3,6 @@
 import socket
 import pickle
 import ssl
-import certifi
 
 HOST = 'localhost'  # The server's hostname or IP address
 PORT = 12345        # The port used by the server
